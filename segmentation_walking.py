@@ -6,10 +6,24 @@ Created on Wed Apr 15 18:55:53 2020
 @author: Filip Paszkiewicz
 """
 import numpy as np
-import matplotlib.pyplot as plt
 
 from Base_Function import *
 from scipy.signal import find_peaks
+
+def Last_HS(seg_data,data,HS,gait_cycle_duration,window_len,index):
+    if (data.shape[0]-HS[0])<gait_cycle_duration:
+        temp = data[HS[index]-int(gait_cycle_duration*0.5):HS[index]+gait_cycle_duration,:]# Window centered arounf the HS - thigh
+    elif (data.shape[0]-HS[0])<int(gait_cycle_duration*0.5):
+        temp = data[HS[index]-int(gait_cycle_duration*0.5):HS[index]+int(gait_cycle_duration*0.5),:]# Window centered arounf the HS - thigh
+    elif (data.shape[0]-HS[0])<window_len:
+        temp = data[HS[index]-int(gait_cycle_duration*0.5):HS[index]+window_len,:]# Window centered arounf the HS - thigh 
+    else:
+        temp = data[HS[index]-int(gait_cycle_duration*0.5):HS[index],:]# Window centered arounf the HS - shank
+        
+    for i in range(0,temp.shape[0]-window_len,50): # Segement rest of the window into 200ms samples. Stacked as a 3D matrix 200ms x no_channels x no_number of sample windows
+        seg_data = np.dstack((seg_data,temp[i:i+window_len,:]))
+    
+    return seg_data
 
 def Segmentation_Walking(PATH1,PATH2,sample_thigh,sample_shank,FS=1000):
     """ Setting parameteres """
@@ -33,7 +47,8 @@ def Segmentation_Walking(PATH1,PATH2,sample_thigh,sample_shank,FS=1000):
     raw_gyro_shank = raw_raw_shank[:,1:7]             # GYRO signal raw data 
     raw_acc_shank = raw_raw_shank[:,13:19]            # Acc signal raw data    
     
-    window_len = 200
+    window_len = int(0.2*FS)
+    gait_cycle_duration = int(0.8*FS)
     
     """ Convert raw accelerometer data into 16-bit singed integar """
     acc_16bit_thigh = acc_raw_to_16bit(raw_acc_thigh)  # Translate high and low bites of raw inertial signals (accelerometer)
@@ -92,31 +107,33 @@ def Segmentation_Walking(PATH1,PATH2,sample_thigh,sample_shank,FS=1000):
     data_thigh = np.concatenate((data_mmg, filter_gyro_thigh, filter_acc_thigh),axis=1)
     data_shank = np.concatenate((filter_gyro_shank, filter_acc_shank),axis=1)
     
-    """ Segmentation of  """
-    seg_data_thigh_walk = np.dstack((data_thigh[HS[0]-window_len:HS[0],:],data_thigh[HS[0]:HS[0]+window_len,:]))
-    seg_data_shank_walk = np.dstack((data_shank[HS[0]-window_len:HS[0],:],data_shank[HS[0]:HS[0]+window_len,:]))
+    """ Segmentation of  data based on Gait Events (here Heel Strikes)"""
+    # Initialise segmented walking data by taking the first part of the window centered arounf the HS
+    seg_data_thigh_walk = data_thigh[HS[0]-int(gait_cycle_duration/2):HS[0]-int(gait_cycle_duration/2-window_len),:]
+    seg_data_shank_walk = data_shank[HS[0]-int(gait_cycle_duration/2):HS[0]-int(gait_cycle_duration/2-window_len),:]
+    temp_thigh = data_thigh[HS[0]-int(gait_cycle_duration/2-50):HS[0]+int(gait_cycle_duration/2),:]# Window centered arounf the HS - thigh
+    temp_shank = data_shank[HS[0]-int(gait_cycle_duration/2-50):HS[0]+int(gait_cycle_duration/2),:]# Window centered arounf the HS - shank
+    for i in range(0,temp_thigh.shape[0]-window_len,50): # Segement rest of the window into 200ms samples. Stacked as a 3D matrix 200ms x no_channels x no_number of sample windows
+        seg_data_thigh_walk = np.dstack((seg_data_thigh_walk,temp_thigh[i:i+window_len,:]))
+        seg_data_shank_walk = np.dstack((seg_data_shank_walk,temp_shank[i:i+window_len,:]))
+    
+    # Data gathered from IMU on Shank and from IMU on the thigh can have differnet lengths
     for i in range(len(HS)-1,0,-1):
         if HS[i]<data_thigh.shape[0]:
             index = i
             break
         
-    if (data_thigh.shape[0]-HS[index])>window_len*2 and (data_shank.shape[0]-HS[index])>window_len*2:
-        for i in range(1,index):
-            seg_data_thigh_walk = np.dstack((seg_data_thigh_walk,data_thigh[HS[i]-window_len:HS[i],:],data_thigh[HS[i]:HS[i]+window_len,:]))
-            seg_data_shank_walk = np.dstack((seg_data_shank_walk,data_shank[HS[i]-window_len:HS[i],:],data_shank[HS[i]:HS[i]+window_len,:]))
-            seg_data_thigh_walk = np.dstack((seg_data_thigh_walk,data_thigh[HS[i]-window_len*2:HS[i]-window_len,:],data_thigh[HS[i]+window_len:HS[i]+window_len*2,:]))
-            seg_data_shank_walk = np.dstack((seg_data_shank_walk,data_shank[HS[i]-window_len*2:HS[i]-window_len,:],data_shank[HS[i]+window_len:HS[i]+window_len*2,:]))
-    else:
-        for i in range(1,index-1):
-            seg_data_thigh_walk = np.dstack((seg_data_thigh_walk,data_thigh[HS[i]-window_len:HS[i],:],data_thigh[HS[i]:HS[i]+window_len,:]))
-            seg_data_shank_walk = np.dstack((seg_data_shank_walk,data_shank[HS[i]-window_len:HS[i],:],data_shank[HS[i]:HS[i]+window_len,:]))
-            seg_data_thigh_walk = np.dstack((seg_data_thigh_walk,data_thigh[HS[i]-window_len*2:HS[i]-window_len,:],data_thigh[HS[i]+window_len:HS[i]+window_len*2,:]))
-            seg_data_shank_walk = np.dstack((seg_data_shank_walk,data_shank[HS[i]-window_len*2:HS[i]-window_len,:],data_shank[HS[i]+window_len:HS[i]+window_len*2,:]))
-        seg_data_thigh_walk = np.dstack((seg_data_thigh_walk,data_thigh[HS[-1]-window_len:HS[-1],:]))
-        seg_data_shank_walk = np.dstack((seg_data_shank_walk,data_shank[HS[-1]-window_len:HS[-1],:]))
-        seg_data_thigh_walk = np.dstack((seg_data_thigh_walk,data_thigh[HS[-1]-window_len*2:HS[-1]-window_len,:]))
-        seg_data_shank_walk = np.dstack((seg_data_shank_walk,data_shank[HS[-1]-window_len*2:HS[-1]-window_len,:]))
-        
+    for i in range(1,index-1):
+        temp_thigh = data_thigh[HS[i]-int(gait_cycle_duration*0.5):HS[i]+int(gait_cycle_duration*0.5),:]# Window centered arounf the HS - thigh
+        temp_shank = data_shank[HS[i]-int(gait_cycle_duration*0.5):HS[i]+int(gait_cycle_duration*0.5),:]# Window centered arounf the HS - shank
+        for i in range(0,temp_thigh.shape[0]-window_len,50): # Segement rest of the window into 200ms samples. Stacked as a 3D matrix 200ms x no_channels x no_number of sample windows
+            seg_data_thigh_walk = np.dstack((seg_data_thigh_walk,temp_thigh[i:i+window_len,:]))
+            seg_data_shank_walk = np.dstack((seg_data_shank_walk,temp_shank[i:i+window_len,:]))  
+    
+    seg_data_thigh_walk = Last_HS(seg_data_thigh_walk,data_thigh,HS,gait_cycle_duration,window_len,index)  
+    seg_data_shank_walk = Last_HS(seg_data_shank_walk,data_shank,HS,gait_cycle_duration,window_len,index)  
+    
+    """ Finding name for saving CSV files """
     if PATH1.find('ME') !=-1:
         begin = PATH1.find('ME')
         name_thigh = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+2] + '_walking_thigh_' 
@@ -126,13 +143,14 @@ def Segmentation_Walking(PATH1,PATH2,sample_thigh,sample_shank,FS=1000):
         name_thigh = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+4] + '_walking_thigh_' 
         name_shank = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+4] + '_walking_shank_' 
     
-    for i in range(seg_data_thigh_walk.shape[2]):
-        temp = name_thigh + str(sample_thigh) + '.csv'
-        np.savetxt(temp, seg_data_thigh_walk[:,:,i], delimiter=",")
-        sample_thigh = sample_thigh + 1
-    for i in range(seg_data_shank_walk.shape[2]):
-        temp = name_shank + str(sample_shank) + '.csv'
-        np.savetxt(temp, seg_data_shank_walk[:,:,i], delimiter=",")
-        sample_shank = sample_shank + 1
+    """ Saving window samples as individual CSV files """
+    # for i in range(seg_data_thigh_walk.shape[2]):
+    #     temp = name_thigh + str(sample_thigh) + '.csv'
+    #     np.savetxt(temp, seg_data_thigh_walk[:,:,i], delimiter=",")
+    #     sample_thigh = sample_thigh + 1
+    # for i in range(seg_data_shank_walk.shape[2]):
+    #     temp = name_shank + str(sample_shank) + '.csv'
+    #     np.savetxt(temp, seg_data_shank_walk[:,:,i], delimiter=",")
+    #     sample_shank = sample_shank + 1
     
     return sample_thigh, sample_shank

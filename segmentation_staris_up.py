@@ -122,14 +122,14 @@ def Segmentation_Staris_Up(PATH1,PATH2,sample_thigh,sample_shank,FS=1000):
         name_thigh = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+4] + '_stairs_up_thigh_' 
         name_shank = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+4] + '_stairs_up_shank_' 
     
-    for i in range(seg_data_thigh_stairs_up.shape[2]):
-        temp = name_thigh + str(sample_thigh) + '.csv'
-        np.savetxt(temp, seg_data_thigh_stairs_up[:,:,i], delimiter=",")
-        sample_thigh = sample_thigh + 1
-    for i in range(seg_data_shank_stairs_up.shape[2]):
-        temp = name_shank + str(sample_shank) + '.csv'
-        np.savetxt(temp, seg_data_shank_stairs_up[:,:,i], delimiter=",")
-        sample_shank = sample_shank + 1
+    # for i in range(seg_data_thigh_stairs_up.shape[2]):
+    #     temp = name_thigh + str(sample_thigh) + '.csv'
+    #     np.savetxt(temp, seg_data_thigh_stairs_up[:,:,i], delimiter=",")
+    #     sample_thigh = sample_thigh + 1
+    # for i in range(seg_data_shank_stairs_up.shape[2]):
+    #     temp = name_shank + str(sample_shank) + '.csv'
+    #     np.savetxt(temp, seg_data_shank_stairs_up[:,:,i], delimiter=",")
+    #     sample_shank = sample_shank + 1
     
     return sample_thigh, sample_shank
             
