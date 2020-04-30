@@ -10,21 +10,7 @@ import matplotlib.pyplot as plt
 
 from Base_Function import *
 from scipy.signal import find_peaks
-
-def Last_HS(seg_data,data,HS,gait_cycle_duration,window_len,index):
-    if (data.shape[0]-HS[0])<gait_cycle_duration:
-        temp = data[HS[index]-int(gait_cycle_duration*0.5):HS[index]+gait_cycle_duration,:]# Window centered arounf the HS - thigh
-    elif (data.shape[0]-HS[0])<int(gait_cycle_duration*0.5):
-        temp = data[HS[index]-int(gait_cycle_duration*0.5):HS[index]+int(gait_cycle_duration*0.5),:]# Window centered arounf the HS - thigh
-    elif (data.shape[0]-HS[0])<window_len:
-        temp = data[HS[index]-int(gait_cycle_duration*0.5):HS[index]+window_len,:]# Window centered arounf the HS - thigh 
-    else:
-        temp = data[HS[index]-int(gait_cycle_duration*0.5):HS[index],:]# Window centered arounf the HS - shank
-        
-    for i in range(0,temp.shape[0]-window_len,50): # Segement rest of the window into 200ms samples. Stacked as a 3D matrix 200ms x no_channels x no_number of sample windows
-        seg_data = np.dstack((seg_data,temp[i:i+window_len,:]))
-    
-    return seg_data
+from segmentation_HS import Segmentation_HS
 
 def Segmentation_Walking(PATH1,PATH2,sample_thigh,sample_shank,FS=1000):
     """ Setting parameteres """
@@ -35,6 +21,9 @@ def Segmentation_Walking(PATH1,PATH2,sample_thigh,sample_shank,FS=1000):
     FRECUT_Dyna = 15                                   # Low cut-off freunecy for segmetnation
     FRECUT_Seg = 6                                     # Low cut-off frequency for Dynamic data
     ORDER_Dyna = 2                                     # Filter order for Dynamic data
+    
+    window_len = int(0.2*FS)                           # Size of moving sample window (set to 200ms)
+    gait_cycle_duration = int(0.8*FS)                  # Duration of an average gait cycle (varies based on gait cycle)
     
     """ Load the csv file into a Numpy array """
     raw_raw_thigh = Open_file_to_array(PATH1)         # Read the CSV file and return a numpy 2D array
@@ -47,9 +36,6 @@ def Segmentation_Walking(PATH1,PATH2,sample_thigh,sample_shank,FS=1000):
     
     raw_gyro_shank = raw_raw_shank[:,1:7]             # GYRO signal raw data 
     raw_acc_shank = raw_raw_shank[:,13:19]            # Acc signal raw data    
-    
-    window_len = int(0.2*FS)
-    gait_cycle_duration = int(0.8*FS)
     
     """ Convert raw accelerometer data into 16-bit singed integar """
     acc_16bit_thigh = acc_raw_to_16bit(raw_acc_thigh)  # Translate high and low bites of raw inertial signals (accelerometer)
@@ -109,30 +95,7 @@ def Segmentation_Walking(PATH1,PATH2,sample_thigh,sample_shank,FS=1000):
     data_shank = np.concatenate((filter_gyro_shank, filter_acc_shank),axis=1)
     
     """ Segmentation of  data based on Gait Events (here Heel Strikes)"""
-    # Initialise segmented walking data by taking the first part of the window centered arounf the HS
-    seg_data_thigh_walk = data_thigh[HS[0]-int(gait_cycle_duration/2):HS[0]-int(gait_cycle_duration/2-window_len),:]
-    seg_data_shank_walk = data_shank[HS[0]-int(gait_cycle_duration/2):HS[0]-int(gait_cycle_duration/2-window_len),:]
-    temp_thigh = data_thigh[HS[0]-int(gait_cycle_duration/2-50):HS[0]+int(gait_cycle_duration/2),:]# Window centered arounf the HS - thigh
-    temp_shank = data_shank[HS[0]-int(gait_cycle_duration/2-50):HS[0]+int(gait_cycle_duration/2),:]# Window centered arounf the HS - shank
-    for i in range(0,temp_thigh.shape[0]-window_len,50): # Segement rest of the window into 200ms samples. Stacked as a 3D matrix 200ms x no_channels x no_number of sample windows
-        seg_data_thigh_walk = np.dstack((seg_data_thigh_walk,temp_thigh[i:i+window_len,:]))
-        seg_data_shank_walk = np.dstack((seg_data_shank_walk,temp_shank[i:i+window_len,:]))
-    
-    # Data gathered from IMU on Shank and from IMU on the thigh can have differnet lengths
-    for i in range(len(HS)-1,0,-1):
-        if HS[i]<data_thigh.shape[0]:
-            index = i
-            break
-        
-    for i in range(1,index-1):
-        temp_thigh = data_thigh[HS[i]-int(gait_cycle_duration*0.5):HS[i]+int(gait_cycle_duration*0.5),:]# Window centered arounf the HS - thigh
-        temp_shank = data_shank[HS[i]-int(gait_cycle_duration*0.5):HS[i]+int(gait_cycle_duration*0.5),:]# Window centered arounf the HS - shank
-        for i in range(0,temp_thigh.shape[0]-window_len,50): # Segement rest of the window into 200ms samples. Stacked as a 3D matrix 200ms x no_channels x no_number of sample windows
-            seg_data_thigh_walk = np.dstack((seg_data_thigh_walk,temp_thigh[i:i+window_len,:]))
-            seg_data_shank_walk = np.dstack((seg_data_shank_walk,temp_shank[i:i+window_len,:]))  
-    
-    seg_data_thigh_walk = Last_HS(seg_data_thigh_walk,data_thigh,HS,gait_cycle_duration,window_len,index)  
-    seg_data_shank_walk = Last_HS(seg_data_shank_walk,data_shank,HS,gait_cycle_duration,window_len,index)  
+    seg_data_thigh_walk, seg_data_shank_walk = Segmentation_HS(data_thigh,data_shank,gait_cycle_duration,window_len,HS)
     
     """ Finding name for saving CSV files """
     if PATH1.find('ME') !=-1:

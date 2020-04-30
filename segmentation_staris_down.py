@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 
 from Base_Function import *
 from scipy.signal import find_peaks
+from segmentation_HS import Segmentation_HS
 
 def Segmentation_Staris_Down(PATH1,PATH2,sample_thigh,sample_shank,FS=1000):
     """ Setting parameteres """
@@ -22,7 +23,8 @@ def Segmentation_Staris_Down(PATH1,PATH2,sample_thigh,sample_shank,FS=1000):
     FRECUT_Seg = 6                                     # Low cut-off frequency for Dynamic data
     ORDER_Dyna = 2                                     # Filter order for Dynamic data
     
-    window_len = 200
+    window_len = int(0.2*FS)                           # Size of moving sample window (set to 200ms)
+    gait_cycle_duration = int(0.85*FS)                 # Duration of an average gait cycle (varies based on gait cycle) 
     
     """ Load the csv file into a Numpy array """
     raw_raw_thigh = Open_file_to_array(PATH1)         # Read the CSV file and return a numpy 2D array
@@ -96,33 +98,9 @@ def Segmentation_Staris_Down(PATH1,PATH2,sample_thigh,sample_shank,FS=1000):
     data_thigh = np.concatenate((data_mmg, filter_gyro_thigh, filter_acc_thigh),axis=1)
     data_shank = np.concatenate((filter_gyro_shank, filter_acc_shank),axis=1)
     
-    """ Segmentation of  """
-    seg_data_thigh_stairs_down = np.dstack((data_thigh[HS[0]-window_len:HS[0],:],data_thigh[HS[0]:HS[0]+window_len,:]))
-    seg_data_shank_stairs_down = np.dstack((data_shank[HS[0]-window_len:HS[0],:],data_shank[HS[0]:HS[0]+window_len,:]))
-    index = 0
-    for i in range(len(HS)-1,0,-1):
-        if HS[i]<data_thigh.shape[0]:
-            index = i
-            break
-        
-    if (data_thigh.shape[0]-HS[index])>window_len*2 and (data_shank.shape[0]-HS[index])>window_len*2:
-        for i in range(1,index):
-            seg_data_thigh_stairs_down = np.dstack((seg_data_thigh_stairs_down,data_thigh[HS[i]-window_len:HS[i],:],data_thigh[HS[i]:HS[i]+window_len,:]))
-            seg_data_shank_stairs_down = np.dstack((seg_data_shank_stairs_down,data_shank[HS[i]-window_len:HS[i],:],data_shank[HS[i]:HS[i]+window_len,:]))
-            seg_data_thigh_stairs_down = np.dstack((seg_data_thigh_stairs_down,data_thigh[HS[i]-window_len*2:HS[i]-window_len,:],data_thigh[HS[i]+window_len:HS[i]+window_len*2,:]))
-            seg_data_shank_stairs_down = np.dstack((seg_data_shank_stairs_down,data_shank[HS[i]-window_len*2:HS[i]-window_len,:],data_shank[HS[i]+window_len:HS[i]+window_len*2,:]))
-    else:
-        for i in range(1,index-1):
-            seg_data_thigh_stairs_down = np.dstack((seg_data_thigh_stairs_down,data_thigh[HS[i]-window_len:HS[i],:],data_thigh[HS[i]:HS[i]+window_len,:]))
-            seg_data_shank_stairs_down = np.dstack((seg_data_shank_stairs_down,data_shank[HS[i]-window_len:HS[i],:],data_shank[HS[i]:HS[i]+window_len,:]))
-            seg_data_thigh_stairs_down = np.dstack((seg_data_thigh_stairs_down,data_thigh[HS[i]-window_len*2:HS[i]-window_len,:],data_thigh[HS[i]+window_len:HS[i]+window_len*2,:]))
-            seg_data_shank_stairs_down = np.dstack((seg_data_shank_stairs_down,data_shank[HS[i]-window_len*2:HS[i]-window_len,:],data_shank[HS[i]+window_len:HS[i]+window_len*2,:]))
-        seg_data_thigh_stairs_down = np.dstack((seg_data_thigh_stairs_down,data_thigh[HS[-1]-window_len:HS[-1],:]))
-        seg_data_shank_stairs_down = np.dstack((seg_data_shank_stairs_down,data_shank[HS[-1]-window_len:HS[-1],:]))
-        seg_data_thigh_stairs_down = np.dstack((seg_data_thigh_stairs_down,data_thigh[HS[-1]-window_len*2:HS[-1]-window_len,:]))
-        seg_data_shank_stairs_down = np.dstack((seg_data_shank_stairs_down,data_shank[HS[-1]-window_len*2:HS[-1]-window_len,:]))
+    """ Segmentation of  data based on Gait Events (here Heel Strikes)"""
+    seg_data_thigh_stairs_down, seg_data_shank_stairs_down = Segmentation_HS(data_thigh,data_shank,gait_cycle_duration,window_len,HS)
        
-    
     if PATH1.find('ME') !=-1:
         begin = PATH1.find('ME')
         name_thigh = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+2] + '_stairs_down_thigh_' 
