@@ -187,233 +187,85 @@ def Saving_Data_to_CSV(flag,sample_length,filter_mmg,filter_acc): # Takes the al
             
             
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-def Plot_Accelerometer(Fs,filter_acc,fft_acc): # Plot some inertial data 
-    N = filter_acc.shape[0] 
-    Ts = 1/Fs
-    ft_acc = np.linspace(0.0, 1.0/(2.0*Ts), N/2) # Show all frequencies from 0Hz
-    time = np.linspace(0,N*Ts,N)                 # Length of recording converted into time using the sampling period
-    filter_acc = filter_acc.astype(np.float)
-    fft_acc = fft_acc.astype(np.complex)
-    time = time.astype(np.float)
-
-    plt.figure(1001) # Plot of the power spectrum (spectral analysis/frequency domain) accelerometer singal which was filtered with a lowpass filter 
-    plt.suptitle('Accelerometer - Filtered response in Fourier')
-    plt.subplot(311)
-    plt.plot(ft_acc, 2.0/N * np.abs(fft_acc[:N//2,0],),'C0', label='x-axis') # Frequencies in  x-axis
-    plt.xlim([-0.5,50])
-    plt.xlabel('Hz')
-    plt.grid(True)
-    plt.legend()
-    plt.subplot(312)    
-    plt.plot(ft_acc, 2.0/N * np.abs(fft_acc[:N//2,1],),'C1', label='y-axis') # Frequencies in  y-axis
-    plt.xlim([-0.5,50])
-    plt.xlabel('Hz')
-    plt.grid(True)
-    plt.legend()
-    plt.subplot(313)
-    plt.plot(ft_acc, 2.0/N * np.abs(fft_acc[:N//2,2],),'C2', label='z-axis') # Frequencies in  z-axis
-    plt.xlim([-0.5,50])
-    plt.xlabel('Hz')
-    plt.grid(True)
-    plt.legend()
-
-    plt.figure(1000) # Plot of the Accelerometer singla, filtered by a lowpass filter, through time
-    plt.suptitle('Accelerometer - Filtered response in Time')
-    plt.subplot(311)
-    plt.plot(time,filter_acc[:,0],'C0', label = 'x-axis')
+def Plot_Data(data_thigh,data_shank,FS,HS,sample_thigh,gait_type):
+    HS_start = 1
+    HS_stop = HS_start + 3
+    
+    # Plotting muscle data=======================================================================================
+    labels = ['Vastus Lateralis','Rectus Femoris','Vastus Medialis','Biceps Femoris','Semitendinosus']
+    t = np.linspace(0,data_thigh.shape[0]/FS,data_thigh.shape[0])
+    HS_lim_plus = np.max(np.max(data_thigh[HS[HS_start]:HS[HS_stop],:5],axis=0))
+    HS_lim_minus = np.min(np.min(data_thigh[HS[HS_start]:HS[HS_stop],:5],axis=0))
+    plt.figure(sample_thigh)
+    plt.subplot(211)
+    plt.title('Muscle activation Human Gait Cycle, Quadriceps - ' + gait_type)
+    for i in range(len(labels)-2):  
+        plt.plot(t[HS[HS_start]:HS[HS_stop]],data_thigh[HS[HS_start]:HS[HS_stop],i],label=labels[i])
     plt.legend()
     plt.grid(True)
-    plt.subplot(312)
-    plt.plot(time,filter_acc[:,1],'C1', label = 'y-axis')
+    for i in range(HS_start,HS_stop+1):
+        plt.vlines(HS[i]/FS,HS_lim_minus,HS_lim_plus,color='black',linestyle='-.')
+    
+    plt.subplot(212)
+    plt.title('Muscle activation Human Gait Cycle, Hamstring - ' + gait_type)
+    for i in range(3,len(labels)):  
+        plt.plot(t[HS[HS_start]:HS[HS_stop]],data_thigh[HS[HS_start]:HS[HS_stop],i],label=labels[i])
+    plt.legend()
+    plt.grid(True)    
+    for i in range(HS_start,HS_stop+1):
+        plt.vlines(HS[i]/FS,HS_lim_minus,HS_lim_plus,color='black',linestyle='-.')
+    
+    # Plotting IMU data from Thigh =============================================================================
+    labels = ['x-axis','y-axis','z-axis']
+    temp = -data_thigh[HS[HS_start]:HS[HS_stop],5:8]
+    HS_lim_plus = np.max(np.max(temp,axis=0))
+    HS_lim_minus = np.min(np.min(temp,axis=0))
+    plt.figure(sample_thigh+1)
+    plt.subplot(211)
+    plt.title('Gyroscope signals in Human Gait Cycle, Thigh - ' + gait_type)
+    for i in range(len(labels)):
+        plt.plot(t[HS[HS_start]:HS[HS_stop]],temp[:,i],label=labels[i])
     plt.legend()
     plt.grid(True)
-    plt.subplot(313)
-    plt.plot(time,filter_acc[:,2],'C2', label = 'z-axis')
-    plt.xlabel('time/s')
-    plt.grid(True)
+    for i in range(HS_start,HS_stop+1):
+        plt.vlines(HS[i]/FS,HS_lim_minus,HS_lim_plus,color='black',linestyle='-.')
+    
+    temp = -data_thigh[HS[HS_start]:HS[HS_stop],8:]
+    HS_lim_plus = np.max(np.max(temp,axis=0))
+    HS_lim_minus = np.min(np.min(temp,axis=0))
+    plt.subplot(212)
+    plt.title('Accelerometer signals in Human Gait Cycle, Thigh - ' + gait_type)
+    for i in range(len(labels)):
+        plt.plot(t[HS[HS_start]:HS[HS_stop]],temp[:,i],label=labels[i])
     plt.legend()
-
+    plt.grid(True)
+    for i in range(HS_start,HS_stop+1):
+        plt.vlines(HS[i]/FS,HS_lim_minus,HS_lim_plus,color='black',linestyle='-.')
+    
+    # Plotting IMU data from Shank ===========================================================================
+    labels = ['x-axis','y-axis','z-axis']
+    temp = -data_shank[HS[HS_start]:HS[HS_stop],:3]
+    HS_lim_plus = np.max(np.max(temp,axis=0))
+    HS_lim_minus = np.min(np.min(temp,axis=0))
+    plt.figure(sample_thigh+2)
+    plt.subplot(211)
+    plt.title('Gyroscope signals in Human Gait Cycle, Shank - ' + gait_type)
+    for i in range(len(labels)):
+        plt.plot(t[HS[HS_start]:HS[HS_stop]],temp[:,i],label=labels[i])
+    plt.legend()
+    plt.grid(True)
+    for i in range(HS_start,HS_stop+1):
+        plt.vlines(HS[i]/FS,HS_lim_minus,HS_lim_plus,color='black',linestyle='-.')
+    
+    temp = -data_shank[HS[HS_start]:HS[HS_stop],3:]
+    HS_lim_plus = np.max(np.max(temp,axis=0))
+    HS_lim_minus = np.min(np.min(temp,axis=0))
+    plt.subplot(212)
+    plt.title('Accelerometer signals in Human Gait Cycle, Shank - ' + gait_type)
+    for i in range(len(labels)):
+        plt.plot(t[HS[HS_start]:HS[HS_stop]],temp[:,i],label=labels[i])
+    plt.legend()
+    plt.grid(True)
+    for i in range(HS_start,HS_stop+1):
+        plt.vlines(HS[i]/FS,HS_lim_minus,HS_lim_plus,color='black',linestyle='-.')
     plt.show()
-
-def Plot_Mechanomyography(Fs,filter_mmg,fft_mmg):  # Plot incoming mmg data (assumes 8 channels)
-    N = filter_mmg.shape[0] 
-    Ts = 1/Fs
-    time = np.linspace(0,N*Ts,N)                 # Length of recording converted into time using the sampling period
-    time = time.astype(np.float)
-    ft_mmg = np.linspace(1.0, 1.0/(2.0*Ts), (N/2)-1) # Show frequencies from 1Hz
-    time = np.linspace(0,N*Ts,N)                     # Length of recording converted into time using the sampling period
-    filter_mmg = filter_mmg.astype(np.float)
-    fft_mmg = fft_mmg.astype(np.complex)
-
-    plt.figure(999) # Plot of the power spectrum (spectral analysis/frequency domain) MMG singal which was filtered with a bandpass filter 
-    plt.suptitle('Mechanomayography - Filtered response in Fourier')
-    plt.subplot(421)
-    plt.plot(ft_mmg, 2.0/N * np.abs(fft_mmg[1:N//2,0]),'C0', label='MMG1') # Channel 1
-    plt.xlim([1,100])
-    plt.ylabel('MMG power amplitude')
-    plt.grid(True)
-    plt.legend()
-    plt.subplot(422)
-    plt.plot(ft_mmg, 2.0/N * np.abs(fft_mmg[1:N//2,1]),'C1', label='MMG2') # Channel 2
-    plt.xlim([1,100])
-    plt.grid(True)
-    plt.legend()
-    plt.subplot(423)
-    plt.plot(ft_mmg, 2.0/N * np.abs(fft_mmg[1:N//2,2]),'C2', label='MMG3') # Channel 3
-    plt.xlim([1,100])
-    plt.grid(True)
-    plt.legend()
-    plt.subplot(424)
-    plt.plot(ft_mmg, 2.0/N * np.abs(fft_mmg[1:N//2,3]),'C3', label='MMG4') # Channel 4
-    plt.xlim([1,100])
-    plt.grid(True)
-    plt.legend()
-    plt.subplot(425)
-    plt.plot(ft_mmg, 2.0/N * np.abs(fft_mmg[1:N//2,4]),'C4', label='MMG5') # Channel 5
-    plt.xlim([1,100])
-    plt.ylabel('MMG power amplitude')
-    plt.xlabel('Hz')
-    plt.grid(True)
-    plt.legend()
-    plt.subplot(426)
-    plt.plot(ft_mmg, 2.0/N * np.abs(fft_mmg[1:N//2,5]),'C5', label='MMG6') # Channel 6
-    plt.xlim([1,100])
-    plt.xlabel('Hz')
-    plt.grid(True)
-    plt.legend()
-    plt.subplot(427)
-    plt.plot(ft_mmg, 2.0/N * np.abs(fft_mmg[1:N//2,6]),'C6', label='MMG7') # Channel 7
-    plt.xlim([1,100])
-    plt.xlabel('Hz')
-    plt.grid(True)
-    plt.legend()
-    plt.subplot(428)
-    plt.plot(ft_mmg, 2.0/N * np.abs(fft_mmg[1:N//2,7]), 'C7', label='MMG8') # Channel 8
-    plt.xlim([1,100])
-    plt.xlabel('Hz')
-    plt.grid(True)
-    plt.legend()
-
-    plt.figure(998) # Plot of the MMG singla, filtered by a bandpass filter, through time
-    plt.suptitle('Mechanomayography - Filtered response in Time')
-    plt.subplot(421)
-    plt.plot(time,filter_mmg[:,0],'C0', label='MMG1') # Channel 1
-    plt.ylabel('MMG amplitude')
-    plt.grid(True)
-    plt.legend()
-    plt.subplot(422)
-    plt.plot(time,filter_mmg[:,1],'C1', label='MMG2') # Channel 2
-    plt.grid(True)
-    plt.legend()
-    plt.subplot(423)
-    plt.plot(time,filter_mmg[:,2],'C2', label='MMG3') # Channel 3
-    plt.ylabel('MMG amplitude')
-    plt.grid(True)
-    plt.legend()
-    plt.subplot(424)
-    plt.plot(time,filter_mmg[:,3],'C3', label='MMG4') # Channel 4
-    plt.grid(True)
-    plt.legend()
-    plt.subplot(425)
-    plt.plot(time,filter_mmg[:,4],'C4', label='MMG5') # Channel 5
-    plt.ylabel('MMG amplitude')
-    plt.grid(True)
-    plt.legend()
-    plt.subplot(426)
-    plt.plot(time,filter_mmg[:,5],'C5', label='MMG6') # Channel 6
-    plt.grid(True)
-    plt.legend()
-    plt.subplot(427)
-    plt.plot(time,filter_mmg[:,6],'C6', label='MMG7') # Channel 7
-    plt.ylabel('MMG amplitude')
-    plt.xlabel('time/s')
-    plt.grid(True)
-    plt.legend()
-    plt.subplot(428)
-    plt.plot(time,filter_mmg[:,7], 'C7', label='MMG8') # Channel 8
-    plt.xlabel('time/s')
-    plt.grid(True)
-    plt.legend()
-
-    plt.show()
-
-def Plot_Differnece(Fs,acc_16bit,filter_acc,mmg_10bit,filter_mmg): # Plot the difference between filtered and raw MMG and ACC data
-    N = filter_acc.shape[0]
-    Ts = 1/Fs
-    time = np.linspace(0,N*Ts,N) # Length of recording converted into time using the sampling period
-    acc_16bit = acc_16bit.astype(np.float)
-    mmg_10bit = mmg_10bit.astype(np.float)
-    filter_acc = filter_acc.astype(np.float)  
-    filter_mmg = filter_mmg.astype(np.float)
-    time = time.astype(np.float)
-
-    plt.figure(997)
-    plt.suptitle('Mechanomayography - Comaprison between Filtered and Raw signal')
-    plt.subplot(421)
-    plt.plot(time,filter_mmg[:,0],'C0', label='MMG1 - Filtered') # Channel 1
-    plt.plot(time,mmg_10bit[:,0],'C7', label='MMG1 - Raw') # Channel 1
-    plt.ylabel('MMG amplitude')
-    plt.grid(True)
-    plt.legend()
-    plt.subplot(422)
-    plt.plot(time,filter_mmg[:,1],'C1', label='MMG2 - Filtered') # Channel 2
-    plt.plot(time,mmg_10bit[:,1],'C6', label='MMG2 - Raw') # Channel 2
-    plt.grid(True)
-    plt.legend()
-    plt.subplot(423)
-    plt.plot(time,filter_mmg[:,2],'C2', label='MMG3 - Filtered') # Channel 3
-    plt.plot(time,mmg_10bit[:,2],'C5', label='MMG3 - Raw') # Channel 3
-    plt.ylabel('MMG amplitude')
-    plt.grid(True)
-    plt.legend()
-    plt.subplot(424)
-    plt.plot(time,filter_mmg[:,3],'C3', label='MMG4 - Filtered') # Channel 4
-    plt.plot(time,mmg_10bit[:,3],'C4', label='MMG4 - Raw') # Channel 4
-    plt.grid(True)
-    plt.legend()
-    plt.subplot(425)
-    plt.plot(time,filter_mmg[:,4],'C4', label='MMG5 - Filtered') # Channel 5
-    plt.plot(time,mmg_10bit[:,4],'C3', label='MMG5 - Raw') # Channel 5
-    plt.ylabel('MMG amplitude')
-    plt.grid(True)
-    plt.legend()
-    plt.subplot(426)
-    plt.plot(time,filter_mmg[:,5],'C5', label='MMG6 - Filtered') # Channel 6
-    plt.plot(time,mmg_10bit[:,5],'C2', label='MMG6 - Raw') # Channel 6
-    plt.grid(True)
-    plt.legend()
-    plt.subplot(427)
-    plt.plot(time,filter_mmg[:,6],'C6', label='MMG7 - Filtered') # Channel 7
-    plt.plot(time,mmg_10bit[:,6],'C1', label='MMG7 - Raw') # Channel 7
-    plt.ylabel('MMG amplitude')
-    plt.xlabel('time/s')
-    plt.grid(True)
-    plt.legend()
-    plt.subplot(428)
-    plt.plot(time,filter_mmg[:,7], 'C7', label='MMG8 - Filtered') # Channel 8
-    plt.plot(time,mmg_10bit[:,7], 'C0', label='MMG8 - Raw') # Channel 8
-    plt.xlabel('time/s')
-    plt.grid(True)
-    plt.legend()
-
-    plt.figure(995)
-    plt.suptitle('Accelerometer - Comaprison between Filtered and Raw signal')
-    plt.subplot(311)
-    plt.plot(time,filter_acc[:,0],'C0', label = 'x-axis - filtered')
-    plt.plot(time,acc_16bit[:,0],'C3', label = 'x-axis - raw')
-    plt.legend()
-    plt.grid(True)
-    plt.subplot(312)
-    plt.plot(time,filter_acc[:,1],'C1', label = 'y-axis - filtered')
-    plt.plot(time,acc_16bit[:,1],'C4', label = 'y-axis - raw')
-    plt.legend()
-    plt.grid(True)
-    plt.subplot(313)
-    plt.plot(time,filter_acc[:,2],'C2', label = 'z-axis - filtered')
-    plt.plot(time,acc_16bit[:,2],'C5', label = 'z-axis - raw')
-    plt.xlabel('time/s')
-    plt.legend()
-    plt.grid(True)
-
-    plt.show()
-

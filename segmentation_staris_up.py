@@ -131,6 +131,10 @@ def Segmentation_Staris_Up(PATH1,PATH2,sample_thigh,sample_shank,FS=1000):
     #     np.savetxt(temp, seg_data_shank_stairs_up[:,:,i], delimiter=",")
     #     sample_shank = sample_shank + 1
     
+    """ Some plotting for visualistion (and publications)  """
+    if PATH1.find('ME') !=-1:
+        Plot_Data(data_thigh,data_shank,FS,HS,sample_thigh,'Stair Ascent')
+        
     return sample_thigh, sample_shank
             
 
