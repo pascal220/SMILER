@@ -6,6 +6,7 @@ Created on Wed Apr 15 18:55:53 2020
 @author: Filip Paszkiewicz
 """
 import numpy as np
+import matplotlib.pyplot as plt
 
 from Base_Function import *
 from scipy.signal import find_peaks
@@ -152,5 +153,91 @@ def Segmentation_Walking(PATH1,PATH2,sample_thigh,sample_shank,FS=1000):
     #     temp = name_shank + str(sample_shank) + '.csv'
     #     np.savetxt(temp, seg_data_shank_walk[:,:,i], delimiter=",")
     #     sample_shank = sample_shank + 1
+    
+    """ Some plotting for visualistion (and publications)  """
+    if PATH1.find('N100') !=-1:
+        HS_start = 10
+        HS_stop = HS_start + 3
+        
+        # Plotting muscle data=======================================================================================
+        labels = ['Vastus Lateralis','Rectus Femoris','Vastus Medialis','Biceps Femoris','Semitendinosus']
+        t = np.linspace(0,data_thigh.shape[0]/FS,data_thigh.shape[0])
+        HS_lim_plus = np.max(np.max(data_thigh[HS[HS_start]:HS[HS_stop],:5],axis=0))
+        HS_lim_minus = np.min(np.min(data_thigh[HS[HS_start]:HS[HS_stop],:5],axis=0))
+        plt.figure(sample_thigh)
+        plt.subplot(211)
+        plt.title('Muscle activation Human Gait Cycle - Walking')
+        for i in range(len(labels)-2):  
+            plt.plot(t[HS[HS_start]:HS[HS_stop]],data_thigh[HS[HS_start]:HS[HS_stop],i],label=labels[i])
+        plt.legend()
+        plt.grid(True)
+        for i in range(HS_start,HS_stop+1):
+            plt.vlines(HS[i]/FS,HS_lim_minus,HS_lim_plus,color='black',linestyle='-.')
+    
+        plt.subplot(212)
+        for i in range(3,len(labels)):  
+            plt.plot(t[HS[HS_start]:HS[HS_stop]],data_thigh[HS[HS_start]:HS[HS_stop],i],label=labels[i])
+        plt.legend()
+        plt.grid(True)    
+        for i in range(HS_start,HS_stop+1):
+            plt.vlines(HS[i]/FS,HS_lim_minus,HS_lim_plus,color='black',linestyle='-.')
+        
+        # Plotting IMU data from Thigh =============================================================================
+        labels = ['x-axis','y-axis','z-axis']
+        temp = -data_thigh[HS[HS_start]:HS[HS_stop],5:8]
+        HS_lim_plus = np.max(np.max(temp,axis=0))
+        HS_lim_minus = np.min(np.min(temp,axis=0))
+        plt.figure(sample_thigh+1)
+        plt.subplot(211)
+        plt.title('Gyroscope signals in Human Gait Cycle - Walking')
+        for i in range(len(labels)):
+            plt.plot(t[HS[HS_start]:HS[HS_stop]],temp[:,i],label=labels[i])
+        plt.legend()
+        plt.grid(True)
+        for i in range(HS_start,HS_stop+1):
+            plt.vlines(HS[i]/FS,HS_lim_minus,HS_lim_plus,color='black',linestyle='-.')
+        
+        temp = -data_thigh[HS[HS_start]:HS[HS_stop],8:]
+        HS_lim_plus = np.max(np.max(temp,axis=0))
+        HS_lim_minus = np.min(np.min(temp,axis=0))
+        plt.subplot(212)
+        plt.title('Accelerometer signals in Human Gait Cycle - Walking')
+        for i in range(len(labels)):
+            plt.plot(t[HS[HS_start]:HS[HS_stop]],temp[:,i],label=labels[i])
+        plt.legend()
+        plt.grid(True)
+        for i in range(HS_start,HS_stop+1):
+            plt.vlines(HS[i]/FS,HS_lim_minus,HS_lim_plus,color='black',linestyle='-.')
+        
+        # Plotting IMU data from Shank ===========================================================================
+        labels = ['x-axis','y-axis','z-axis']
+        temp = -data_shank[HS[HS_start]:HS[HS_stop],:3]
+        HS_lim_plus = np.max(np.max(temp,axis=0))
+        HS_lim_minus = np.min(np.min(temp,axis=0))
+        plt.figure(sample_thigh+2)
+        plt.subplot(211)
+        plt.title('Gyroscope signals in Human Gait Cycle - Walking')
+        for i in range(len(labels)):
+            plt.plot(t[HS[HS_start]:HS[HS_stop]],temp[:,i],label=labels[i])
+        plt.legend()
+        plt.grid(True)
+        for i in range(HS_start,HS_stop+1):
+            plt.vlines(HS[i]/FS,HS_lim_minus,HS_lim_plus,color='black',linestyle='-.')
+        
+        temp = -data_shank[HS[HS_start]:HS[HS_stop],3:]
+        HS_lim_plus = np.max(np.max(temp,axis=0))
+        HS_lim_minus = np.min(np.min(temp,axis=0))
+        plt.subplot(212)
+        plt.title('Accelerometer signals in Human Gait Cycle - Walking')
+        for i in range(len(labels)):
+            plt.plot(t[HS[HS_start]:HS[HS_stop]],temp[:,i],label=labels[i])
+        plt.legend()
+        plt.grid(True)
+        for i in range(HS_start,HS_stop+1):
+            plt.vlines(HS[i]/FS,HS_lim_minus,HS_lim_plus,color='black',linestyle='-.')
+        plt.show()
+    
+    sample_thigh = sample_thigh + 3
+    sample_shank = sample_shank + 3
     
     return sample_thigh, sample_shank
