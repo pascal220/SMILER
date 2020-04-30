@@ -14,7 +14,7 @@ from scipy.signal import find_peaks
 from scipy.signal import savgol_filter
 from windowing_SS_data import Windowing_SS_Data
 
-def Segmentation_SS(PATH1,PATH2,sample_sit_thigh,sample_stand_thigh,sample_sit_shank,sample_stand_shank,FS=1000,):
+def Segmentation_SS(PATH1,PATH2,sample_sit_thigh,sample_stand_thigh,sample_sit_shank,sample_stand_shank,FS=1000,Flag_Save_Data=False,Flag_Plotting=False):
     """ Setting parameteres """
     LOWCUT_MMG = 1                                     # Low cut-off frequency for MMG
     HIGHCUT_MMG = 100                                  # High cut-off frequency for MMG
@@ -92,38 +92,38 @@ def Segmentation_SS(PATH1,PATH2,sample_sit_thigh,sample_stand_thigh,sample_sit_s
     seg_sit_to_stand_thigh, seg_stand_to_sit_thigh = Windowing_SS_Data(data_thigh,peaks_acc,troughs_acc)
     seg_sit_to_stand_shank, seg_stand_to_sit_shank = Windowing_SS_Data(data_shank,peaks_acc,troughs_acc)
     
-    if PATH1.find('ME') !=-1:
-        begin = PATH1.find('ME')
-        name_thigh_sit = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+2] + '_sit_thigh_' 
-        name_thigh_stand = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+2] + '_stand_thigh_' 
-        name_shank_sit = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+2] + '_sit_shank_' 
-        name_shank_stand = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+2] + '_stand_shank_' 
-    else:
-        begin = PATH1.find('N',22)
-        name_thigh_sit = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+4] + '_sit_thigh_' 
-        name_thigh_stand = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+4] + '_stand_thigh_' 
-        name_shank_sit = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+4] + '_sit_shank_' 
-        name_shank_stand = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+4] + '_stand_shank_' 
-    
-    for i in range(seg_sit_to_stand_thigh.shape[2]):
-        temp = name_thigh_sit + str(sample_sit_thigh) + '.csv'
-        np.savetxt(temp, seg_sit_to_stand_thigh[:,:,i], delimiter=",")
-        sample_sit_thigh = sample_sit_thigh + 1        
-    
-    for i in range(seg_stand_to_sit_thigh.shape[2]):
-        temp = name_thigh_stand + str(sample_stand_thigh) + '.csv'
-        np.savetxt(temp, seg_stand_to_sit_thigh[:,:,i], delimiter=",")
-        sample_stand_thigh = sample_stand_thigh + 1
+    """ Finding name for saving CSV files """
+    if Flag_Save_Data == True:
+        if PATH1.find('ME') !=-1:
+            begin = PATH1.find('ME')
+            name_thigh_sit = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+2] + '_sit_thigh_' 
+            name_thigh_stand = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+2] + '_stand_thigh_' 
+            name_shank_sit = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+2] + '_sit_shank_' 
+            name_shank_stand = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+2] + '_stand_shank_' 
+        else:
+            begin = PATH1.find('N',22)
+            name_thigh_sit = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+4] + '_sit_thigh_' 
+            name_thigh_stand = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+4] + '_stand_thigh_' 
+            name_shank_sit = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+4] + '_sit_shank_' 
+            name_shank_stand = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+4] + '_stand_shank_' 
         
-    for i in range(seg_sit_to_stand_shank.shape[2]):
-        temp = name_shank_sit + str(sample_sit_shank) + '.csv'
-        np.savetxt(temp, seg_sit_to_stand_shank[:,:,i], delimiter=",")
-        sample_sit_shank = sample_sit_shank + 1
-    
-    for i in range(seg_stand_to_sit_shank.shape[2]):
-        temp = name_shank_stand + str(sample_stand_shank) + '.csv'
-        np.savetxt(temp, seg_stand_to_sit_shank[:,:,i], delimiter=",")
-        sample_stand_shank = sample_stand_shank + 1
+        """ Saving window samples as individual CSV files """
+        for i in range(seg_sit_to_stand_thigh.shape[2]):
+            temp = name_thigh_sit + str(sample_sit_thigh) + '.csv'
+            np.savetxt(temp, seg_sit_to_stand_thigh[:,:,i], delimiter=",")
+            sample_sit_thigh = sample_sit_thigh + 1        
+        for i in range(seg_stand_to_sit_thigh.shape[2]):
+            temp = name_thigh_stand + str(sample_stand_thigh) + '.csv'
+            np.savetxt(temp, seg_stand_to_sit_thigh[:,:,i], delimiter=",")
+            sample_stand_thigh = sample_stand_thigh + 1   
+        for i in range(seg_sit_to_stand_shank.shape[2]):
+            temp = name_shank_sit + str(sample_sit_shank) + '.csv'
+            np.savetxt(temp, seg_sit_to_stand_shank[:,:,i], delimiter=",")
+            sample_sit_shank = sample_sit_shank + 1
+        for i in range(seg_stand_to_sit_shank.shape[2]):
+            temp = name_shank_stand + str(sample_stand_shank) + '.csv'
+            np.savetxt(temp, seg_stand_to_sit_shank[:,:,i], delimiter=",")
+            sample_stand_shank = sample_stand_shank + 1
                 
     return sample_sit_thigh, sample_stand_thigh, sample_sit_shank, sample_stand_shank
     

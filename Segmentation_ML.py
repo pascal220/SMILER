@@ -14,7 +14,7 @@ from os.path import isfile, join
 from segmentation_staris_up import Segmentation_Staris_Up
 from segmentation_staris_down import Segmentation_Staris_Down
 from segmentation_walking import Segmentation_Walking
-# from segmentation_SS import Segmentation_SS
+from segmentation_SS import Segmentation_SS
 
 # parser = argparse.ArgumentParser(description='Segmenting MMG/IMU data for ML')
 # parser.add_argument('-P', '--PATH', type=str, metavar='', required=True, help='Path of data files directory')
@@ -32,16 +32,17 @@ if __name__ == "__main__":
     files = [f for f in listdir(PATH) if isfile(join(PATH, f))]
     files.sort()
     
+    to_save_data = False
     sample_1_thigh = 0
     sample_1_shank = 0
     sample_2_thigh = 0
     sample_2_shank = 0
     sample_3_thigh = 0
     sample_3_shank = 0
-    # sample_4_thigh = 0
-    # sample_5_thigh = 0
-    # sample_4_shank = 0
-    # sample_5_shank = 0
+    sample_4_thigh = 0
+    sample_5_thigh = 0
+    sample_4_shank = 0
+    sample_5_shank = 0
     
     for i in range(0,len(files),2):
         if files[i].find('up') !=-1: 
@@ -49,27 +50,27 @@ if __name__ == "__main__":
             PATH2 = PATH + files[i+1]
             sample_1_thigh = sample_1_thigh + 1
             sample_1_shank = sample_1_shank + 1
-            sample_1_thigh, sample_1_shank = Segmentation_Staris_Up(PATH1,PATH2,sample_1_thigh,sample_1_shank)
+            sample_1_thigh, sample_1_shank = Segmentation_Staris_Up(PATH1,PATH2,sample_1_thigh,sample_1_shank,Flag_Save_Data=to_save_data)
         elif files[i].find('down') !=-1: 
             PATH1 = PATH + files[i]
             PATH2 = PATH + files[i+1]
             sample_2_thigh = sample_2_thigh + 1
             sample_2_shank = sample_2_shank + 1
-            sample_2_thigh, sample_2_shank = Segmentation_Staris_Down(PATH1,PATH2,sample_2_thigh,sample_2_shank)
+            sample_2_thigh, sample_2_shank = Segmentation_Staris_Down(PATH1,PATH2,sample_2_thigh,sample_2_shank,Flag_Save_Data=to_save_data)
         elif files[i].find('walking') !=-1: 
             PATH1 = PATH + files[i]
             PATH2 = PATH + files[i+1]
             sample_3_thigh = sample_3_thigh + 1
             sample_3_shank = sample_3_shank + 1
-            sample_3_thigh, sample_3_shank  = Segmentation_Walking(PATH1,PATH2,sample_3_thigh,sample_3_shank)
-        # elif files[i].find('sit_to_stand') !=-1: 
-        #     PATH1 = PATH + files[i]
-        #     PATH2 = PATH + files[i+1]
-        #     sample_4_thigh = sample_4_thigh + 1
-        #     sample_5_thigh = sample_5_thigh + 1
-        #     sample_4_shank = sample_4_shank + 1
-        #     sample_5_shank = sample_5_shank + 1
-        #     sample_4_thigh, sample_5_thigh, sample_4_shank, sample_5_shank = Segmentation_SS(PATH1,PATH2,sample_4_thigh,sample_5_thigh,sample_4_shank,sample_5_shank)
+            sample_3_thigh, sample_3_shank  = Segmentation_Walking(PATH1,PATH2,sample_3_thigh,sample_3_shank,Flag_Save_Data=to_save_data)
+        elif files[i].find('sit_to_stand') !=-1: 
+            PATH1 = PATH + files[i]
+            PATH2 = PATH + files[i+1]
+            sample_4_thigh = sample_4_thigh + 1
+            sample_5_thigh = sample_5_thigh + 1
+            sample_4_shank = sample_4_shank + 1
+            sample_5_shank = sample_5_shank + 1
+            sample_4_thigh, sample_5_thigh, sample_4_shank, sample_5_shank = Segmentation_SS(PATH1,PATH2,sample_4_thigh,sample_5_thigh,sample_4_shank,sample_5_shank,Flag_Save_Data=to_save_data)        
     
     print("Your program took %0.2f seconds to run." % (time.time() - start_time))
             

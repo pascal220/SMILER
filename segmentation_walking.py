@@ -12,7 +12,7 @@ from Base_Function import *
 from scipy.signal import find_peaks
 from segmentation_HS import Segmentation_HS
 
-def Segmentation_Walking(PATH1,PATH2,sample_thigh,sample_shank,FS=1000):
+def Segmentation_Walking(PATH1,PATH2,sample_thigh,sample_shank,FS=1000,Flag_Save_Data=False,Flag_Plotting=False):
     """ Setting parameteres """
     LOWCUT_MMG = 1                                     # Low cut-off frequency for MMG
     HIGHCUT_MMG = 100                                  # High cut-off frequency for MMG
@@ -98,27 +98,28 @@ def Segmentation_Walking(PATH1,PATH2,sample_thigh,sample_shank,FS=1000):
     seg_data_thigh_walk, seg_data_shank_walk = Segmentation_HS(data_thigh,data_shank,gait_cycle_duration,window_len,HS)
     
     """ Finding name for saving CSV files """
-    if PATH1.find('ME') !=-1:
-        begin = PATH1.find('ME')
-        name_thigh = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+2] + '_walking_thigh_' 
-        name_shank = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+2] + '_walking_shank_'  
-    else:
-        begin = PATH1.find('N',22)
-        name_thigh = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+4] + '_walking_thigh_' 
-        name_shank = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+4] + '_walking_shank_' 
-    
-    """ Saving window samples as individual CSV files """
-    # for i in range(seg_data_thigh_walk.shape[2]):
-    #     temp = name_thigh + str(sample_thigh) + '.csv'
-    #     np.savetxt(temp, seg_data_thigh_walk[:,:,i], delimiter=",")
-    #     sample_thigh = sample_thigh + 1
-    # for i in range(seg_data_shank_walk.shape[2]):
-    #     temp = name_shank + str(sample_shank) + '.csv'
-    #     np.savetxt(temp, seg_data_shank_walk[:,:,i], delimiter=",")
-    #     sample_shank = sample_shank + 1
-    
+    if Flag_Save_Data == True:
+        if PATH1.find('ME') !=-1:
+            begin = PATH1.find('ME')
+            name_thigh = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+2] + '_walking_thigh_' 
+            name_shank = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+2] + '_walking_shank_'  
+        else:
+            begin = PATH1.find('N',22)
+            name_thigh = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+4] + '_walking_thigh_' 
+            name_shank = 'MMG_test/ML_Windowed_Data/' + PATH1[begin:begin+4] + '_walking_shank_' 
+        
+        """ Saving window samples as individual CSV files """
+        for i in range(seg_data_thigh_walk.shape[2]):
+            temp = name_thigh + str(sample_thigh) + '.csv'
+            np.savetxt(temp, seg_data_thigh_walk[:,:,i], delimiter=",")
+            sample_thigh = sample_thigh + 1
+        for i in range(seg_data_shank_walk.shape[2]):
+            temp = name_shank + str(sample_shank) + '.csv'
+            np.savetxt(temp, seg_data_shank_walk[:,:,i], delimiter=",")
+            sample_shank = sample_shank + 1
+        
     """ Some plotting for visualistion (and publications)  """
-    if PATH1.find('N100') !=-1:
+    if Flag_Plotting == True:
         Plot_Data(data_thigh,data_shank,FS,HS,sample_thigh,'Walking')
     
     return sample_thigh, sample_shank
