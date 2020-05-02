@@ -5,13 +5,11 @@ Created on Wed Apr 15 19:05:57 2020
 
 @author: Filip Paszkiewicz
 """
-import random
 import numpy as np
 import matplotlib.pyplot as plt
 
 from Base_Function import *
 from scipy.signal import find_peaks
-from scipy.signal import savgol_filter
 from windowing_SS_data import Windowing_SS_Data
 
 def Segmentation_SS(PATH1,PATH2,sample_sit_thigh,sample_stand_thigh,sample_sit_shank,sample_stand_shank,FS=1000,Flag_Save_Data=False,Flag_Plotting=False):
@@ -124,19 +122,10 @@ def Segmentation_SS(PATH1,PATH2,sample_sit_thigh,sample_stand_thigh,sample_sit_s
             temp = name_shank_stand + str(sample_stand_shank) + '.csv'
             np.savetxt(temp, seg_stand_to_sit_shank[:,:,i], delimiter=",")
             sample_stand_shank = sample_stand_shank + 1
-                
+    
+    """ Plotting SS """
+    if Flag_Plotting == True:
+        HS = [peaks_acc[1],troughs_acc[1],peaks_acc[2],troughs_acc[2],peaks_acc[3]]
+        Plot_Data_SS(data_thigh,data_shank,sample_sit_thigh,FS,HS)                
+    
     return sample_sit_thigh, sample_stand_thigh, sample_sit_shank, sample_stand_shank
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    

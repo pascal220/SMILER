@@ -201,8 +201,6 @@ def Plot_Data(data_thigh,data_shank,FS,HS,sample_thigh,gait_type):
     plt.title('Muscle activation Human Gait Cycle, Quadriceps(top)/Hamstring(bottom) - ' + gait_type)
     for i in range(len(labels)-2):  
         plt.plot(t[HS[HS_start]:HS[HS_stop]],data_thigh[HS[HS_start]:HS[HS_stop],i],label=labels[i])
-    plt.legend()
-    plt.grid(True)
     for i in range(HS_start,HS_stop+1):
         plt.vlines(HS[i]/FS,HS_lim_minus,HS_lim_plus,color='black',linestyle='-.')
     for i in range(HS_start,HS_stop):
@@ -211,12 +209,12 @@ def Plot_Data(data_thigh,data_shank,FS,HS,sample_thigh,gait_type):
         plt.fill_between(t[lim_fil:HS[i+1]],y1=HS_lim_minus,y2=HS_lim_plus,facecolor='red',alpha=0.15)
     plt.xlabel('Time(s)')
     plt.ylabel('MMG(V)')
+    plt.grid(True)
+    plt.legend()
     
     plt.subplot(212)
     plt.plot(t[HS[HS_start]:HS[HS_stop]],data_thigh[HS[HS_start]:HS[HS_stop],3],label=labels[3],color='purple')
-    plt.plot(t[HS[HS_start]:HS[HS_stop]],data_thigh[HS[HS_start]:HS[HS_stop],4],label=labels[4],color='brown')
-    plt.legend()
-    plt.grid(True)    
+    plt.plot(t[HS[HS_start]:HS[HS_stop]],data_thigh[HS[HS_start]:HS[HS_stop],4],label=labels[4],color='brown')  
     for i in range(HS_start,HS_stop+1):
         plt.vlines(HS[i]/FS,HS_lim_minus,HS_lim_plus,color='black',linestyle='-.')
     for i in range(HS_start,HS_stop):
@@ -225,6 +223,8 @@ def Plot_Data(data_thigh,data_shank,FS,HS,sample_thigh,gait_type):
         plt.fill_between(t[lim_fil:HS[i+1]],y1=HS_lim_minus,y2=HS_lim_plus,facecolor='red',alpha=0.15)
     plt.xlabel('Time(s)')
     plt.ylabel('MMG(V)')
+    plt.grid(True)
+    plt.legend()
     
     # Plotting IMU data from Thigh =============================================================================
     labels = ['x-axis','y-axis','z-axis']
@@ -236,8 +236,6 @@ def Plot_Data(data_thigh,data_shank,FS,HS,sample_thigh,gait_type):
     plt.title('IMU signals in Human Gait Cycle, Thigh - ' + gait_type)
     for i in range(len(labels)):
         plt.plot(t[HS[HS_start]:HS[HS_stop]],temp[:,i],label=labels[i])
-    plt.legend()
-    plt.grid(True)
     for i in range(HS_start,HS_stop+1):
         plt.vlines(HS[i]/FS,HS_lim_minus,HS_lim_plus,color='black',linestyle='-.')
     for i in range(HS_start,HS_stop):
@@ -246,6 +244,8 @@ def Plot_Data(data_thigh,data_shank,FS,HS,sample_thigh,gait_type):
         plt.fill_between(t[lim_fil:HS[i+1]],y1=HS_lim_minus,y2=HS_lim_plus,facecolor='red',alpha=0.15)
     plt.xlabel('Time(s)')
     plt.ylabel('Acceleration(Degree/s^2)')
+    plt.grid(True)
+    plt.legend()
     
     temp = -data_thigh[HS[HS_start]:HS[HS_stop],8:]
     HS_lim_plus = np.max(np.max(temp,axis=0))
@@ -253,8 +253,6 @@ def Plot_Data(data_thigh,data_shank,FS,HS,sample_thigh,gait_type):
     plt.subplot(212)
     for i in range(len(labels)):
         plt.plot(t[HS[HS_start]:HS[HS_stop]],temp[:,i],label=labels[i])
-    plt.legend()
-    plt.grid(True)
     for i in range(HS_start,HS_stop+1):
         plt.vlines(HS[i]/FS,HS_lim_minus,HS_lim_plus,color='black',linestyle='-.')
     for i in range(HS_start,HS_stop):
@@ -263,9 +261,11 @@ def Plot_Data(data_thigh,data_shank,FS,HS,sample_thigh,gait_type):
       plt.fill_between(t[lim_fil:HS[i+1]],y1=HS_lim_minus,y2=HS_lim_plus,facecolor='red',alpha=0.15)
     plt.xlabel('Time(s)')
     plt.ylabel('Acceleration(G)')
-    
+    plt.grid(True)
+    plt.legend()
+   
     # Plotting IMU data from Shank ===========================================================================
-    labels = ['x-axis','y-axis','z-axis']
+    t = np.linspace(0,data_shank.shape[0]/FS,data_shank.shape[0])
     temp = -data_shank[HS[HS_start]:HS[HS_stop],:3]
     HS_lim_plus = np.max(np.max(temp,axis=0))
     HS_lim_minus = np.min(np.min(temp,axis=0))
@@ -274,8 +274,6 @@ def Plot_Data(data_thigh,data_shank,FS,HS,sample_thigh,gait_type):
     plt.title('IMU signals in Human Gait Cycle, Shank - ' + gait_type)
     for i in range(len(labels)):
         plt.plot(t[HS[HS_start]:HS[HS_stop]],temp[:,i],label=labels[i])
-    plt.legend()
-    plt.grid(True)
     for i in range(HS_start,HS_stop+1):
         plt.vlines(HS[i]/FS,HS_lim_minus,HS_lim_plus,color='black',linestyle='-.')
     for i in range(HS_start,HS_stop):
@@ -284,6 +282,8 @@ def Plot_Data(data_thigh,data_shank,FS,HS,sample_thigh,gait_type):
         plt.fill_between(t[lim_fil:HS[i+1]],y1=HS_lim_minus,y2=HS_lim_plus,facecolor='red',alpha=0.15)
     plt.xlabel('Time(s)')
     plt.ylabel('Acceleration(Degree/s^2)')
+    plt.grid(True)
+    plt.legend()
     
     temp = -data_shank[HS[HS_start]:HS[HS_stop],3:]
     HS_lim_plus = np.max(np.max(temp,axis=0))
@@ -291,8 +291,6 @@ def Plot_Data(data_thigh,data_shank,FS,HS,sample_thigh,gait_type):
     plt.subplot(212)
     for i in range(len(labels)):
         plt.plot(t[HS[HS_start]:HS[HS_stop]],temp[:,i],label=labels[i])
-    plt.legend()
-    plt.grid(True)
     for i in range(HS_start,HS_stop+1):
         plt.vlines(HS[i]/FS,HS_lim_minus,HS_lim_plus,color='black',linestyle='-.')
     for i in range(HS_start,HS_stop):
@@ -301,5 +299,119 @@ def Plot_Data(data_thigh,data_shank,FS,HS,sample_thigh,gait_type):
         plt.fill_between(t[lim_fil:HS[i+1]],y1=HS_lim_minus,y2=HS_lim_plus,facecolor='red',alpha=0.15)    
     plt.xlabel('Time(s)')
     plt.ylabel('Acceleration(G)')
+    plt.grid(True)
+    plt.legend()
+    
+    plt.show()
+
+def Plot_Data_SS(data_thigh,data_shank,sample_sit_thigh,FS,HS):
+    last_pos = len(HS)-1
+    t_thigh = np.linspace(0,data_thigh.shape[0]/1000,data_thigh.shape[0])
+    t_shank = np.linspace(0,data_shank.shape[0]/1000,data_shank.shape[0])
+    
+    # Plotting muscle data=======================================================================================
+    labels = ['Vastus Lateralis','Rectus Femoris','Vastus Medialis','Biceps Femoris','Semitendinosus']
+    HS_lim_plus = np.max(np.max(data_thigh[HS[0]:HS[last_pos],:5],axis=0))
+    HS_lim_minus = np.min(np.min(data_thigh[HS[0]:HS[last_pos],:5],axis=0))
+    plt.figure(sample_sit_thigh)
+    plt.subplot(211)
+    plt.title('Muscle activation in Standing Up and Sitting Down, Quadriceps(top)/Hamstring(bottom)')
+    for i in range(len(labels)-2):  
+        plt.plot(t_thigh[HS[0]:HS[last_pos]],data_thigh[HS[0]:HS[last_pos],i],label=labels[i])
+    for peak in HS:
+        plt.vlines(peak/FS,HS_lim_minus,HS_lim_plus,color='black',linestyle='-.')
+    for i in range(0,last_pos,2):
+        plt.fill_between(t_thigh[HS[i]:HS[i+1]],y1=HS_lim_minus,y2=HS_lim_plus,facecolor='blue',alpha=0.1)
+        plt.fill_between(t_thigh[HS[i+1]:HS[i+2]],y1=HS_lim_minus,y2=HS_lim_plus,facecolor='red',alpha=0.1)
+    plt.xlabel('Time(s)')
+    plt.ylabel('MMG(V)')
+    plt.grid(True)
+    plt.legend()
+    
+    plt.subplot(212)
+    plt.plot(t_thigh[HS[0]:HS[last_pos]],data_thigh[HS[0]:HS[last_pos],3],label=labels[3],color='purple')
+    plt.plot(t_thigh[HS[0]:HS[last_pos]],data_thigh[HS[0]:HS[last_pos],4],label=labels[4],color='brown')
+    for peak in HS:
+        plt.vlines(peak/FS,HS_lim_minus,HS_lim_plus,color='black',linestyle='-.')
+    for i in range(0,last_pos,2):
+        plt.fill_between(t_thigh[HS[i]:HS[i+1]],y1=HS_lim_minus,y2=HS_lim_plus,facecolor='blue',alpha=0.1)
+        plt.fill_between(t_thigh[HS[i+1]:HS[i+2]],y1=HS_lim_minus,y2=HS_lim_plus,facecolor='red',alpha=0.1)
+    plt.xlabel('Time(s)')
+    plt.ylabel('MMG(V)')
+    plt.grid(True)
+    plt.legend()
+    
+    # Plotting IMU data from Thigh =============================================================================
+    labels = ['x-axis','y-axis','z-axis']
+    temp = -data_thigh[HS[0]:HS[last_pos],5:8]
+    HS_lim_plus = np.max(np.max(temp,axis=0))
+    HS_lim_minus = np.min(np.min(temp,axis=0))
+    plt.figure(sample_sit_thigh+1)
+    plt.subplot(211)    
+    plt.title('IMU signals in during Standing Up and Sitting Down, Thigh')
+    for i in range(len(labels)):
+        plt.plot(t_thigh[HS[0]:HS[last_pos]],temp[:,i],label=labels[i])
+    for peak in HS:
+        plt.vlines(peak/FS,HS_lim_minus,HS_lim_plus,color='black',linestyle='-.')
+    for i in range(0,last_pos,2):
+        plt.fill_between(t_thigh[HS[i]:HS[i+1]],y1=HS_lim_minus,y2=HS_lim_plus,facecolor='blue',alpha=0.1)
+        plt.fill_between(t_thigh[HS[i+1]:HS[i+2]],y1=HS_lim_minus,y2=HS_lim_plus,facecolor='red',alpha=0.1)
+    plt.xlabel('Time(s)')
+    plt.ylabel('Acceleration(Degree/s^2)')
+    plt.grid(True)
+    plt.legend()
+    
+    labels = ['x-axis','y-axis','z-axis']
+    temp = -data_thigh[HS[0]:HS[last_pos],8:]
+    HS_lim_plus = np.max(np.max(temp,axis=0))
+    HS_lim_minus = np.min(np.min(temp,axis=0)) 
+    plt.subplot(212)
+    for i in range(len(labels)):
+        plt.plot(t_thigh[HS[0]:HS[last_pos]],temp[:,i],label=labels[i])
+    for peak in HS:
+        plt.vlines(peak/FS,HS_lim_minus,HS_lim_plus,color='black',linestyle='-.')
+    for i in range(0,last_pos,2):
+        plt.fill_between(t_thigh[HS[i]:HS[i+1]],y1=HS_lim_minus,y2=HS_lim_plus,facecolor='blue',alpha=0.1)
+        plt.fill_between(t_thigh[HS[i+1]:HS[i+2]],y1=HS_lim_minus,y2=HS_lim_plus,facecolor='red',alpha=0.1)
+    plt.xlabel('Time(s)')
+    plt.ylabel('Acceleration(G)')
+    plt.grid(True)
+    plt.legend()
+    
+     # Plotting IMU data from Shank ===========================================================================   
+    temp = -data_shank[HS[0]:HS[last_pos],:3]
+    HS_lim_plus = np.max(np.max(temp,axis=0))
+    HS_lim_minus = np.min(np.min(temp,axis=0))
+    plt.figure(sample_sit_thigh+2)
+    plt.subplot(211)    
+    plt.title('IMU signals in during Standing Up and Sitting Down, Shank')
+    for i in range(len(labels)):
+        plt.plot(t_shank[HS[0]:HS[last_pos]],temp[:,i],label=labels[i])
+    for peak in HS:
+        plt.vlines(peak/FS,HS_lim_minus,HS_lim_plus,color='black',linestyle='-.')
+    for i in range(0,last_pos,2):
+        plt.fill_between(t_shank[HS[i]:HS[i+1]],y1=HS_lim_minus,y2=HS_lim_plus,facecolor='blue',alpha=0.1)
+        plt.fill_between(t_shank[HS[i+1]:HS[i+2]],y1=HS_lim_minus,y2=HS_lim_plus,facecolor='red',alpha=0.1)
+    plt.xlabel('Time(s)')
+    plt.ylabel('Acceleration(Degree/s^2)')
+    plt.grid(True)
+    plt.legend()
+    
+    labels = ['x-axis','y-axis','z-axis']
+    temp = -data_shank[HS[0]:HS[last_pos],3:]
+    HS_lim_plus = np.max(np.max(temp,axis=0))
+    HS_lim_minus = np.min(np.min(temp,axis=0)) 
+    plt.subplot(212)
+    for i in range(len(labels)):
+        plt.plot(t_shank[HS[0]:HS[last_pos]],temp[:,i],label=labels[i])
+    for peak in HS:
+        plt.vlines(peak/FS,HS_lim_minus,HS_lim_plus,color='black',linestyle='-.')
+    for i in range(0,last_pos,2):
+        plt.fill_between(t_shank[HS[i]:HS[i+1]],y1=HS_lim_minus,y2=HS_lim_plus,facecolor='blue',alpha=0.1)
+        plt.fill_between(t_shank[HS[i+1]:HS[i+2]],y1=HS_lim_minus,y2=HS_lim_plus,facecolor='red',alpha=0.1)
+    plt.xlabel('Time(s)')
+    plt.ylabel('Acceleration(G)')
+    plt.grid(True)
+    plt.legend()    
     
     plt.show()

@@ -33,7 +33,7 @@ if __name__ == "__main__":
     files.sort()
     
     to_save_data = False
-    to_plot_data = True
+    to_plot_data = False
     
     sample_1_thigh = 0
     sample_1_shank = 0
