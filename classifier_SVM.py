@@ -138,12 +138,11 @@ def Classifier_SVM(PATH,FS=1000,Flag_Load=True,flag_LDA_comparison=False):
     y_imu = thigh_imu_ml[:,0]
     X_imu = thigh_imu_ml[:,1:]
     
-    
     # Shank segregetion 
     # y_shank_ml = shank_ml[:,0]
     # X_shank_ml = shank_ml[:,1:]
     
-    Sensor_Fusion = True
+    Sensor_Fusion = False
     
     if Sensor_Fusion == True:    
         scaler = preprocessing.StandardScaler()# Initialise standarizer
@@ -174,29 +173,62 @@ def Classifier_SVM(PATH,FS=1000,Flag_Load=True,flag_LDA_comparison=False):
             LDA_clf.fit(X_train_stand, y_train)
             print('Calssification accuracy with LDA on test set: %0.3f' % LDA_clf.score(X_test_stand, y_test))
         
-        # Plot normalized confusion matrix
+        """ Plot normalized confusion matrix """
         labels = ['Walk','SA','SD','Sit','Stand']
         disp = plot_confusion_matrix(SVM_clf,X_t_test,y_test,cmap=plt.cm.Reds, normalize='true',display_labels=labels)
         disp.ax_.set_title("Normalized confusion matrix")
         plt.show()
-    
+    else:
+        # Classifing MMG data ============================================================================================
+        scaler_mmg = preprocessing.StandardScaler()# Initialise standarizer
 
+        """ Split data into a train and test sets """
+        X_train_mmg, X_test_mmg, y_train_mmg, y_test_mmg = train_test_split(X_mmg, y_mmg, test_size=0.2, random_state=0)
+        
+        """ Standariza data before traning """
+        scaler_mmg.fit(X_train_mmg)
+        X_train_std_mmg = scaler_mmg.transform(X_train_mmg)
+        X_test_std_mmg = scaler_mmg.transform(X_test_mmg)
+        
+        """ Dimensionality reduction using PCA """
+        pca_mmg = PCA(n_components = 140)    
+        pca_mmg.fit(X_train_std_mmg)
+        X_train_pca_mmg = pca_mmg.transform(X_train_std_mmg)
+        X_test_pca_mmg = pca_mmg.transform(X_test_std_mmg)
+        
+        SVM_clf_mmg = SVC(decision_function_shape ='ovr',kernel ='rbf',gamma = 'scale')
+        SVM_clf_mmg.fit(X_train_pca_mmg, y_train_mmg)
+        print('Calssification accuracy with SVM on test set for MMG: %0.3f' % SVM_clf_mmg.score(X_test_pca_mmg, y_test_mmg))        
+        
+        """ Plot normalized confusion matrix """
+        labels = ['Walk','SA','SD','Sit','Stand']
+        disp = plot_confusion_matrix(SVM_clf_mmg,X_test_pca_mmg,y_test_mmg,cmap=plt.cm.Reds, normalize='true',display_labels=labels)
+        disp.ax_.set_title("Normalized confusion matrix")
+        plt.show()
+        
+        # Classifing IMU data ============================================================================================
+        scaler_imu = preprocessing.StandardScaler()# Initialise standarizer
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        """ Split data into a train and test sets """
+        X_train_imu, X_test_imu, y_train_imu, y_test_imu = train_test_split(X_imu, y_imu, test_size=0.2, random_state=0)
+        
+        """ Standariza data before traning """
+        scaler_imu.fit(X_train_imu)
+        X_train_std_imu = scaler_imu.transform(X_train_imu)
+        X_test_std_imu = scaler_imu.transform(X_test_imu)
+        
+        """ Dimensionality reduction using PCA """
+        pca_imu = PCA(n_components = 160)    
+        pca_imu.fit(X_train_std_imu)
+        X_train_pca_imu = pca_imu.transform(X_train_std_imu)
+        X_test_pca_imu = pca_imu.transform(X_test_std_imu)
+        
+        SVM_clf_imu = SVC(decision_function_shape ='ovr',kernel ='rbf',gamma = 'scale')
+        SVM_clf_imu.fit(X_train_pca_imu, y_train_imu)
+        print('Calssification accuracy with SVM on test set for IMU: %0.3f' % SVM_clf_imu.score(X_test_pca_imu, y_test_imu))  
+        
+        """ Plot normalized confusion matrix """
+        labels = ['Walk','SA','SD','Sit','Stand']
+        disp = plot_confusion_matrix(SVM_clf_imu,X_test_pca_imu,y_test_imu,cmap=plt.cm.Reds, normalize='true',display_labels=labels)
+        disp.ax_.set_title("Normalized confusion matrix")
+        plt.show()
