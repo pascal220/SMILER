@@ -210,7 +210,7 @@ def Plot_Data(data_thigh,data_shank,FS,HS,sample_thigh,gait_type):
     plt.xlabel('Time(s)')
     plt.ylabel('MMG(V)')
     plt.grid(True)
-    plt.legend()
+    plt.legend(loc=1)   
     
     plt.subplot(212)
     plt.plot(t[HS[HS_start]:HS[HS_stop]],data_thigh[HS[HS_start]:HS[HS_stop],3],label=labels[3],color='purple')
@@ -224,7 +224,7 @@ def Plot_Data(data_thigh,data_shank,FS,HS,sample_thigh,gait_type):
     plt.xlabel('Time(s)')
     plt.ylabel('MMG(V)')
     plt.grid(True)
-    plt.legend()
+    plt.legend(loc=1)   
     
     # Plotting IMU data from Thigh =============================================================================
     labels = ['x-axis','y-axis','z-axis']
@@ -245,7 +245,7 @@ def Plot_Data(data_thigh,data_shank,FS,HS,sample_thigh,gait_type):
     plt.xlabel('Time(s)')
     plt.ylabel('Acceleration(Degree/s^2)')
     plt.grid(True)
-    plt.legend()
+    plt.legend(loc=1)   
     
     temp = -data_thigh[HS[HS_start]:HS[HS_stop],8:]
     HS_lim_plus = np.max(np.max(temp,axis=0))
@@ -262,7 +262,7 @@ def Plot_Data(data_thigh,data_shank,FS,HS,sample_thigh,gait_type):
     plt.xlabel('Time(s)')
     plt.ylabel('Acceleration(G)')
     plt.grid(True)
-    plt.legend()
+    plt.legend(loc=1)   
    
     # Plotting IMU data from Shank ===========================================================================
     t = np.linspace(0,data_shank.shape[0]/FS,data_shank.shape[0])
@@ -283,7 +283,7 @@ def Plot_Data(data_thigh,data_shank,FS,HS,sample_thigh,gait_type):
     plt.xlabel('Time(s)')
     plt.ylabel('Acceleration(Degree/s^2)')
     plt.grid(True)
-    plt.legend()
+    plt.legend(loc=1)   
     
     temp = -data_shank[HS[HS_start]:HS[HS_stop],3:]
     HS_lim_plus = np.max(np.max(temp,axis=0))
@@ -300,7 +300,7 @@ def Plot_Data(data_thigh,data_shank,FS,HS,sample_thigh,gait_type):
     plt.xlabel('Time(s)')
     plt.ylabel('Acceleration(G)')
     plt.grid(True)
-    plt.legend()
+    plt.legend(loc=1)   
     
     plt.show()
 
@@ -326,7 +326,7 @@ def Plot_Data_SS(data_thigh,data_shank,sample_sit_thigh,FS,HS):
     plt.xlabel('Time(s)')
     plt.ylabel('MMG(V)')
     plt.grid(True)
-    plt.legend()
+    plt.legend(loc=1)   
     
     plt.subplot(212)
     plt.plot(t_thigh[HS[0]:HS[last_pos]],data_thigh[HS[0]:HS[last_pos],3],label=labels[3],color='purple')
@@ -339,7 +339,7 @@ def Plot_Data_SS(data_thigh,data_shank,sample_sit_thigh,FS,HS):
     plt.xlabel('Time(s)')
     plt.ylabel('MMG(V)')
     plt.grid(True)
-    plt.legend()
+    plt.legend(loc=1)   
     
     # Plotting IMU data from Thigh =============================================================================
     labels = ['x-axis','y-axis','z-axis']
@@ -359,7 +359,7 @@ def Plot_Data_SS(data_thigh,data_shank,sample_sit_thigh,FS,HS):
     plt.xlabel('Time(s)')
     plt.ylabel('Acceleration(Degree/s^2)')
     plt.grid(True)
-    plt.legend()
+    plt.legend(loc=1)   
     
     labels = ['x-axis','y-axis','z-axis']
     temp = -data_thigh[HS[0]:HS[last_pos],8:]
@@ -376,7 +376,7 @@ def Plot_Data_SS(data_thigh,data_shank,sample_sit_thigh,FS,HS):
     plt.xlabel('Time(s)')
     plt.ylabel('Acceleration(G)')
     plt.grid(True)
-    plt.legend()
+    plt.legend(loc=1)   
     
      # Plotting IMU data from Shank ===========================================================================   
     temp = -data_shank[HS[0]:HS[last_pos],:3]
@@ -395,7 +395,7 @@ def Plot_Data_SS(data_thigh,data_shank,sample_sit_thigh,FS,HS):
     plt.xlabel('Time(s)')
     plt.ylabel('Acceleration(Degree/s^2)')
     plt.grid(True)
-    plt.legend()
+    plt.legend(loc=1)   
     
     labels = ['x-axis','y-axis','z-axis']
     temp = -data_shank[HS[0]:HS[last_pos],3:]
@@ -412,6 +412,6 @@ def Plot_Data_SS(data_thigh,data_shank,sample_sit_thigh,FS,HS):
     plt.xlabel('Time(s)')
     plt.ylabel('Acceleration(G)')
     plt.grid(True)
-    plt.legend()    
+    plt.legend(loc=1)    
     
     plt.show()

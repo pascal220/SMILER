@@ -19,7 +19,7 @@ from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import plot_confusion_matrix
 
-def Classifier_SVM(PATH,FS=1000,Flag_Load=True,flag_LDA_comparison=False):
+def Classifier_SVM(PATH,FS=1000,Flag_Load=False,flag_LDA_comparison=False):
     """ Load Features from saved files """
     if Flag_Load == True:
         thigh = Open_file_to_array('MMG_test/ML_Features/thigh.csv')
