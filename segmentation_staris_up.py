@@ -23,8 +23,8 @@ def Segmentation_Staris_Up(PATH1,PATH2,sample_thigh,sample_shank,FS=1000,Flag_Sa
     FRECUT_Seg = 6                                     # Low cut-off frequency for Dynamic data
     ORDER_Dyna = 2                                     # Filter order for Dynamic data
 
-    window_len = int(0.2*FS)                           # Size of moving sample window (set to 200ms)
-    gait_cycle_duration = int(0.75*FS)                 # Duration of an average gait cycle (varies based on gait cycle) 
+    window_len = int(0.2*FS)+1                         # Size of moving sample window (set to 200ms)
+    gait_cycle_duration = int(0.75*FS)+1               # Duration of an average gait cycle (varies based on gait cycle)  
     
     """ Load the csv file into a Numpy array """
     raw_raw_thigh = Open_file_to_array(PATH1)         # Read the CSV file and return a numpy 2D array

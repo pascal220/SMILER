@@ -10,10 +10,8 @@ import numpy as np
 from features_ml import *
 from Base_Function import *
 
-def Extract_Features(path,file_path,FS=1000):
-    data_array = Open_file_to_array(path+file_path)
+def Call_all_Features(data_array,FS):
     data_array_features = Feature_RMS(data_array)
-    
     data_array_features = np.append(data_array_features,Feature_IAV(data_array),axis=0)
     data_array_features = np.append(data_array_features,Feature_MAV(data_array),axis=0)
     data_array_features = np.append(data_array_features,Feature_SSI(data_array),axis=0)
@@ -29,7 +27,7 @@ def Extract_Features(path,file_path,FS=1000):
     data_array_features = np.append(data_array_features,Feature_MMAV1(data_array),axis=0)
     data_array_features = np.append(data_array_features,Feature_MMAV2(data_array),axis=0)
     data_array_features = np.append(data_array_features,Feature_AR(data_array),axis=0)
-    data_array_features = np.append(data_array_features,Feature_LD(data_array),axis=0)
+    # data_array_features = np.append(data_array_features,Feature_LD(data_array),axis=0)
     data_array_features = np.append(data_array_features,Feature_Mean_F(data_array,FS),axis=0)
     data_array_features = np.append(data_array_features,Feature_Median_F(data_array,FS),axis=0)
     data_array_features = np.append(data_array_features,Feature_Peak_F(data_array,FS),axis=0)
@@ -39,4 +37,39 @@ def Extract_Features(path,file_path,FS=1000):
     data_array_features = np.append(data_array_features,Feature_SM2(data_array,FS),axis=0)
     data_array_features = np.append(data_array_features,Feature_SM3(data_array,FS),axis=0)
     
-    return np.transpose(data_array_features)
+    return data_array_features
+
+def Extract_Features(path,file_path,FS=1000):
+    data_array = Open_file_to_array(path+file_path)
+    if data_array.shape[1] == 11:
+        data_mmg = data_array[:,:5]
+        data_IMU = data_array[:,5:]
+        
+        features_MMG_back = Call_all_Features(data_mmg,FS)
+        features_IMU_back = Call_all_Features(data_IMU,FS)
+        return features_MMG_back, features_IMU_back
+    else:
+        features_to_back =  Call_all_Features(data_array,FS)
+        return features_to_back
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    

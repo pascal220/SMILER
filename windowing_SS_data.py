@@ -14,7 +14,7 @@ def Windowing_SS_Data(data,peaks_acc,troughs_acc,FS=1000):
     seg_data_sit_to_stand = []
     seg_data_stand_to_sit = []
     
-    window_length = int(0.2*FS)
+    window_length = int(0.2*FS)+1
     
     """ Using peaks and troughs in y-axis of the thigh accelrometer to segment MMG and IMU data into windows of window_lengthms.
     A sliding window with setp 50 is used. """
