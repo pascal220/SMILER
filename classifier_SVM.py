@@ -191,7 +191,7 @@ def Classifier_SVM(PATH,FS=1000,Flag_Load=True,flag_LDA_comparison=False):
         X_test_std_mmg = scaler_mmg.transform(X_test_mmg)
         
         """ Dimensionality reduction using PCA """
-        pca_mmg = PCA(n_components = 140)    
+        pca_mmg = PCA(n_components = 55)    
         pca_mmg.fit(X_train_std_mmg)
         X_train_pca_mmg = pca_mmg.transform(X_train_std_mmg)
         X_test_pca_mmg = pca_mmg.transform(X_test_std_mmg)
@@ -218,7 +218,7 @@ def Classifier_SVM(PATH,FS=1000,Flag_Load=True,flag_LDA_comparison=False):
         X_test_std_imu = scaler_imu.transform(X_test_imu)
         
         """ Dimensionality reduction using PCA """
-        pca_imu = PCA(n_components = 160)    
+        pca_imu = PCA(n_components = 75)    
         pca_imu.fit(X_train_std_imu)
         X_train_pca_imu = pca_imu.transform(X_train_std_imu)
         X_test_pca_imu = pca_imu.transform(X_test_std_imu)
