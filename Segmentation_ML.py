@@ -64,7 +64,7 @@ if __name__ == "__main__":
             PATH2 = PATH + files[i+1]
             sample_3_thigh = sample_3_thigh + 1
             sample_3_shank = sample_3_shank + 1
-            sample_3_thigh, sample_3_shank  = Segmentation_Walking(PATH1,PATH2,sample_3_thigh,sample_3_shank,Flag_Save_Data=to_save_data,Flag_Plotting=True)
+            sample_3_thigh, sample_3_shank  = Segmentation_Walking(PATH1,PATH2,sample_3_thigh,sample_3_shank,Flag_Save_Data=to_save_data,Flag_Plotting=to_plot_data)
         elif files[i].find('sit_to_stand') !=-1: 
             PATH1 = PATH + files[i]
             PATH2 = PATH + files[i+1]

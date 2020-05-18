@@ -6,18 +6,25 @@ Created on Thu Apr 23 20:10:19 2020
 @author: Filip Paszkiewicz
 """
 import numpy as np
+
 import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d import Axes3D
 
 from os import listdir
 from os.path import isfile, join
-from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+
+# Libraries writen by the author 
 from extract_features import Extract_Features
 from Base_Function import Open_file_to_array
+from analysis_of_feature_validity import Analysis_of_Feature_Validity
+
 from sklearn import preprocessing
 from sklearn.decomposition import PCA
 from sklearn.svm import SVC
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import plot_confusion_matrix
+
 
 def Classifier_SVM(PATH,FS=1000,Flag_Load=True,flag_LDA_comparison=False):
     """ Load Features from saved files """
@@ -31,9 +38,10 @@ def Classifier_SVM(PATH,FS=1000,Flag_Load=True,flag_LDA_comparison=False):
         files.sort()
         
         # Matrices have to be initialisated for vstack. Don't know how to go around any other way
-        number_mmg = 28*5+1
-        number_imu = 28*6+1
-        number_shank = 28*6+1
+        no_features = 28
+        number_mmg = no_features*5+1
+        number_imu = no_features*6+1
+        number_shank = no_features*6+1
         
         walking_thigh_mmg = np.zeros(number_mmg)
         walking_thigh_imu = np.zeros(number_imu)
@@ -132,6 +140,9 @@ def Classifier_SVM(PATH,FS=1000,Flag_Load=True,flag_LDA_comparison=False):
         np.savetxt('MMG_test/ML_Features/thigh_imu.csv',thigh_imu_ml,delimiter=",")
         np.savetxt('MMG_test/ML_Features/shank.csv',shank_ml,delimiter=",")
     
+    # Analysis of Features
+    thigh_mmg_ml, thigh_imu_ml, shank_ml = Analysis_of_Feature_Validity(thigh_mmg_ml,thigh_imu_ml,shank_ml)
+   
     # Thigh segregation
     y_mmg = thigh_mmg_ml[:,0]
     X_mmg = thigh_mmg_ml[:,1:]
@@ -159,12 +170,13 @@ def Classifier_SVM(PATH,FS=1000,Flag_Load=True,flag_LDA_comparison=False):
         X_test_stand = scaler.transform(X_test)
         
         """ Dimensionality reduction using PCA """
-        pca = PCA(n_components = 197)    
+        pca = PCA()   #154 
         pca.fit(X_train_stand)
         X_t_train = pca.transform(X_train_stand)
         X_t_test = pca.transform(X_test_stand)
-        
-        SVM_clf = SVC(decision_function_shape ='ovr',kernel ='rbf',gamma = 'scale')
+        # print('Percentage of variance explained by each of the selected components.', pca.explained_variance_ratio_)
+
+        SVM_clf = SVC(decision_function_shape ='ovr',kernel ='rbf',gamma = 'scale',C = 1)
         SVM_clf.fit(X_t_train, y_train)
         print('Calssification accuracy with SVM on test set: %0.3f' % SVM_clf.score(X_t_test, y_test))
         
@@ -191,10 +203,11 @@ def Classifier_SVM(PATH,FS=1000,Flag_Load=True,flag_LDA_comparison=False):
         X_test_std_mmg = scaler_mmg.transform(X_test_mmg)
         
         """ Dimensionality reduction using PCA """
-        pca_mmg = PCA(n_components = 55)    
+        pca_mmg = PCA()   #140
         pca_mmg.fit(X_train_std_mmg)
         X_train_pca_mmg = pca_mmg.transform(X_train_std_mmg)
         X_test_pca_mmg = pca_mmg.transform(X_test_std_mmg)
+        # print('Percentage of variance explained by each of the selected components.', pca_mmg.explained_variance_ratio_)
         
         SVM_clf_mmg = SVC(decision_function_shape ='ovr',kernel ='rbf',gamma = 'scale')
         SVM_clf_mmg.fit(X_train_pca_mmg, y_train_mmg)
@@ -218,10 +231,11 @@ def Classifier_SVM(PATH,FS=1000,Flag_Load=True,flag_LDA_comparison=False):
         X_test_std_imu = scaler_imu.transform(X_test_imu)
         
         """ Dimensionality reduction using PCA """
-        pca_imu = PCA(n_components = 75)    
+        pca_imu = PCA()    #84
         pca_imu.fit(X_train_std_imu)
         X_train_pca_imu = pca_imu.transform(X_train_std_imu)
         X_test_pca_imu = pca_imu.transform(X_test_std_imu)
+        # print('Percentage of variance explained by each of the selected components.', pca_imu.explained_variance_ratio_)
         
         SVM_clf_imu = SVC(decision_function_shape ='ovr',kernel ='rbf',gamma = 'scale')
         SVM_clf_imu.fit(X_train_pca_imu, y_train_imu)
