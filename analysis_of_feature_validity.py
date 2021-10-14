@@ -12,14 +12,15 @@ import numpy as np
 from sklearn.feature_selection import VarianceThreshold
 
 def Analysis_of_Feature_Validity(thigh_mmg_ml,thigh_imu_ml,shank_ml):
-
+    thresh_imu = 0.001
+    
     # var_thigh_mmg = np.var(thigh_mmg_ml[:,1:],axis=0)
     # var_thigh_imu = np.var(thigh_imu_ml[:,1:], axis=0)
     # var_shank     = np.var(shank_ml[:,1:], axis=0)
     
     selector_mmg = VarianceThreshold(threshold = 0)
-    selector_imu_thigh = VarianceThreshold(threshold = 0.001)   
-    selector_imu_shank = VarianceThreshold(threshold = 0.001)   
+    selector_imu_thigh = VarianceThreshold(threshold = thresh_imu)   
+    selector_imu_shank = VarianceThreshold(threshold = thresh_imu)   
      
     selector_mmg.fit(thigh_mmg_ml[:,1:])
     selector_imu_thigh.fit(thigh_imu_ml[:,1:])

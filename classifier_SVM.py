@@ -153,7 +153,7 @@ def Classifier_SVM(PATH,FS=1000,Flag_Load=True,flag_LDA_comparison=False):
     # y_shank_ml = shank_ml[:,0]
     # X_shank_ml = shank_ml[:,1:]
     
-    Sensor_Fusion = False
+    Sensor_Fusion = True
     
     if Sensor_Fusion == True:    
         scaler = preprocessing.StandardScaler()# Initialise standarizer
@@ -170,7 +170,7 @@ def Classifier_SVM(PATH,FS=1000,Flag_Load=True,flag_LDA_comparison=False):
         X_test_stand = scaler.transform(X_test)
         
         """ Dimensionality reduction using PCA """
-        pca = PCA()   #154 
+        pca = PCA(50)   #154 
         pca.fit(X_train_stand)
         X_t_train = pca.transform(X_train_stand)
         X_t_test = pca.transform(X_test_stand)

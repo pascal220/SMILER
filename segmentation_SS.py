@@ -18,8 +18,8 @@ def Segmentation_SS(PATH1,PATH2,sample_sit_thigh,sample_stand_thigh,sample_sit_s
     HIGHCUT_MMG = 100                                  # High cut-off frequency for MMG
     ORDER_MMG = 3                                      # Filter order for MMG
     
-    FRECUT_Dyna = 15                                   # Low cut-off freunecy for segmetnation
-    FRECUT_Seg = 1                                     # Low cut-off frequency for Dynamic data
+    FRECUT_Dyna = 15                                   # Low cut-off frequency for Dynamic data 
+    FRECUT_Seg = 1                                     # Low cut-off frequency for segmetnation
     ORDER_Dyna = 2                                     # Filter order for Dynamic data
     
     """ Load the csv file into a Numpy array """
@@ -52,12 +52,11 @@ def Segmentation_SS(PATH1,PATH2,sample_sit_thigh,sample_stand_thigh,sample_sit_s
     den_filter_mmg, nom_filter_mmg     =  butter_bandpass(LOWCUT_MMG, HIGHCUT_MMG, FS, ORDER_MMG) # Calculating nom and den for a filter of specified order to filter MMG data
     
     
-    """ Finding segmnetation points """
+    """ Finding segmnetation points (peaks and troughs) """
     filter_seg = butter_filter(acc_16bit_thigh, den_filter_seg, nom_filter_seg)
     if PATH1.find('N010') !=-1:
-        filter_seg = -filter_seg
-        peaks_acc, _ = find_peaks(filter_seg[:,1],height=-0.1,distance=2500)
-        troughs_acc, _ = find_peaks(-filter_seg[:,1],height=0.1,distance=2500)
+        peaks_acc, _ = find_peaks(-filter_seg[:,1],height=-0.1,distance=2500)
+        troughs_acc, _ = find_peaks(filter_seg[:,1],height=0.1,distance=2500)
     else:
         peaks_acc, _ = find_peaks(filter_seg[:,1],height=0.2,distance=1500)
         troughs_acc, _ = find_peaks(-filter_seg[:,1],height=-0.4,distance=2000)

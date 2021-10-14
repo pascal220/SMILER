@@ -12,7 +12,7 @@ import numpy as np
 import pandas as pd 
 import matplotlib.pyplot as plt
 
-from scipy.signal import butter, filtfilt
+from scipy.signal import butter, filtfilt, spectrogram
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 def Open_file_to_array(path_to_file): # Function takes in a file path, exctracts the file and sends it back as a numpy array
@@ -302,12 +302,20 @@ def Plot_Data(data_thigh,data_shank,FS,HS,sample_thigh,gait_type):
     plt.grid(True)
     plt.legend(loc=1)   
     
+    
+    f, t, Sxx = spectrogram(data_thigh[HS[HS_start]:HS[HS_stop],1],FS,window='hamming')
+    plt.figure(sample_thigh+3)
+    plt.pcolormesh(t, f, Sxx, shading='gouraud')
+    plt.ylabel('Frequency [Hz]')
+    plt.xlabel('Time [sec]')
+    plt.ylim([0,100])
+    
     plt.show()
 
 def Plot_Data_SS(data_thigh,data_shank,sample_sit_thigh,FS,HS):
     last_pos = len(HS)-1
-    t_thigh = np.linspace(0,data_thigh.shape[0]/1000,data_thigh.shape[0])
-    t_shank = np.linspace(0,data_shank.shape[0]/1000,data_shank.shape[0])
+    t_thigh = np.linspace(0,data_thigh.shape[0]/FS,data_thigh.shape[0])
+    t_shank = np.linspace(0,data_shank.shape[0]/FS,data_shank.shape[0])
     
     # Plotting muscle data=======================================================================================
     labels = ['Vastus Lateralis','Rectus Femoris','Vastus Medialis','Biceps Femoris','Semitendinosus']
